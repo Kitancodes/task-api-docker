@@ -19,7 +19,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# In-memory storage (this will be replaced with PostgreSQL in Project 5)
+# In-memory storage
 tasks_db: List[Task] = []
 task_id_counter = 1
 
