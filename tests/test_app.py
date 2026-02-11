@@ -1,14 +1,15 @@
 import pytest
 from fastapi.testclient import TestClient
-from app.main import app
-from app.api import tasks as tasks_module  # import tasks.py as a module to access tasks list
+import sys
+import app
 
-client = TestClient(app)
+client = TestClient(app.app)
 
 # Automatically clear tasks before each test
 @pytest.fixture(autouse=True)
 def clear_tasks():
-    tasks_module.tasks.clear()  # reset the in-memory task list
+    app.tasks_db.clear()  # reset the in-memory task list
+    app.task_id_counter = 1
 
 def test_root_health_check():
     response = client.get("/")
