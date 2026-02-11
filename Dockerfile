@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the entire application code
 COPY . .
 
-# Expose port 8000 (documentation, doesn't actually open the port)
+# Expose port 8000
 EXPOSE 8000
 
 # Command to run when the container starts
