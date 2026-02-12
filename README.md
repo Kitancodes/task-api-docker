@@ -1,117 +1,121 @@
-# FastAPI Task Service
+# Task Management API
 
-I built this project to implement a complete CI/CD workflow around a simple FastAPI application. The focus of this repository is not just the API itself, but the automation, containerization, and deployment pipeline that takes the application from code to a running service on AWS EC2.
+I built this project to implement a complete CI/CD workflow around a FastAPI application. It's nothing so fancy, it just focuses on automation, containerization, and deployment infrastructure rather than complex application logic.
 
-The project demonstrates how I structure continuous integration, build reproducible Docker artifacts, version container images properly, and automate deployment to a cloud server.
+## What This Is
 
-## Project Overview
+A RESTful task management API built with FastAPI. The application handles basic CRUD operations for tasks, but the real value is in the DevOps implementation around it.
 
-This is a RESTful task management API built with FastAPI. It allows users to create, retrieve, update, and delete tasks.
+I implemented:
 
-Beyond the API functionality, I implemented:
+* Continuous Integration with automated testing on every commit
+* Multi-stage Docker builds optimized for production
+* Commit-based image tagging for deployment traceability
+* Continuous Deployment to AWS EC2
+* Automated container orchestration and restart policies
 
-- Continuous Integration with automated testing
-- Docker-based containerization
-- Commit-based image tagging strategy
-- Continuous Deployment to AWS EC2
-- Automated container restart on new deployments
-
-Every push to the `main` branch triggers the full pipeline: tests run, a Docker image is built and tagged, the image is pushed to DockerHub, and the running container on EC2 is updated automatically.
+Every push to the main branch triggers the full pipeline: tests run, Docker images build and push to DockerHub, and the running container on EC2 updates automatically without manual intervention.
 
 ## Technology Stack
 
-- FastAPI
-- Pytest
-- Docker
-- GitHub Actions
-- DockerHub
-- AWS EC2 (Ubuntu)
+* FastAPI for the REST API
+* Pytest for automated testing
+* Docker with multi-stage builds
+* GitHub Actions for CI/CD orchestration
+* DockerHub for container registry
+* AWS EC2 running Ubuntu 24.04
 
-## CI Pipeline
+## CI Pipeline Implementation
 
-I configured GitHub Actions to run on every push and pull request.
+I configured GitHub Actions to run on every push and pull request to the main branch.
 
-The CI workflow:
+The CI workflow executes in this order:
 
-1. Installs project dependencies.
-2. Runs unit tests using Pytest.
-3. Fails immediately if tests do not pass.
-4. Builds the Docker image only after tests succeed.
-
-This ensures that only verified builds move forward in the pipeline.
+1. Checks out the codebase
+2. Sets up Python 3.11 environment
+3. Installs project dependencies
+4. Runs the full test suite with Pytest
+5. Halts the pipeline if any tests fail
+6. Proceeds to Docker build only after test verification
 
 ## Docker Strategy
 
-I containerized the application to ensure consistency across environments.
+I implemented multi-stage Docker builds to optimize the final image size. The first stage uses the full Python image to install dependencies. The second stage uses python:3.11-slim and copies only the installed packages from the builder stage.
 
-For each successful build, I:
+This reduced the image from 432 MB to 192 MB, a 55% reduction. Smaller images mean faster deployments, lower bandwidth costs, and reduced attack surface in production.
 
-- Tag the image as `latest`.
-- Tag the image with the commit SHA for traceability.
-- Push both tags to DockerHub.
+For each successful build, I tag the image twice:
 
-This allows me to trace deployments back to specific commits and maintain reproducible builds.
+* `latest` for the most recent stable build
+* The commit SHA for exact version traceability
+
+Both tags push to DockerHub automatically. This tagging strategy allows me to roll back to specific commits if needed and maintain a clear deployment history.
 
 ## Continuous Deployment
 
-I implemented Continuous Deployment to automatically update the application running on AWS EC2.
+I implemented CD to automatically update the application running on AWS EC2 whenever code merges to main.
 
-On every push to `main`, the CD workflow:
+The deployment workflow:
 
-1. Pulls the latest Docker image from DockerHub.
-2. Stops and removes the existing container on EC2.
-3. Runs a new container using the updated image.
-4. Starts the container with `--restart unless-stopped` to ensure resilience.
+1. Authenticates to the EC2 instance via SSH using GitHub Secrets
+2. Pulls the latest Docker image from DockerHub
+3. Stops and removes the existing container
+4. Starts a new container with the updated image
+5. Applies the `--restart unless-stopped` policy for automatic recovery
 
-## Live Deployment
+The entire process from git push to live deployment takes approximately three minutes. I use GitHub Secrets to store SSH keys and Docker credentials securely.
 
-The application is deployed on an AWS EC2 instance and runs inside a Docker container.
+## Infrastructure 
 
-Swagger documentation is accessible at:
-
-http://3.90.33.89/:8000/docs
+The application is deployed on an AWS EC2 instance and runs inside a Docker container. The instance may be stopped when not in use to reduce cost, but the deployment proof is included below.
 
 ## Deployment Screenshots
 
-### Swagger UI
+API Documentation Interface:
 
 ![Swagger UI](assets/task-api-service-ui.png)
 
-### DockerHub Image
+Docker Image on DockerHub:
 
-![DockerHub Image](assets/docker-image.png)
+![DockerHub Repository](assets/docker-repository.png)
 
-### EC2 Running Container
+Application Running on EC2:
 
 ![EC2 Container](assets/EC2-task-api.png)
 
-## How to Run Locally
+## Running Locally
 
 Clone the repository:
-
 ```
 git clone https://github.com/Kitancodes/task-api-docker.git
-cd cd task-api-docker
+cd task-api-docker
 ```
-Install dependencies:
 
+Install dependencies:
 ```
 pip install -r requirements.txt
 ```
 
-Run tests:
-
+Run the test suite:
 ```
-pytest
-```
-
-Build and run the container:
-
-```
-docker build -t fastapi-task-service .
-docker run -d -p 8000:8000 fastapi-task-service
+pytest tests/ -v
 ```
 
-Access the application at:
+Build and run with Docker:
+```
+docker build -t task-api .
+docker run -d -p 8000:8000 task-api
+```
 
-http://localhost:8000/docs
+Access the API documentation at http://localhost:8000/docs
+
+## What's Next?
+
+I plan to implement these improvements:
+
+* Add Nginx reverse proxy with SSL/TLS using Let's Encrypt
+* Implement PostgreSQL database with Docker Compose for persistent storage
+* Set up centralized logging with Loki and Promtail
+* Add monitoring and alerting with Prometheus and Grafana
+* Implement blue-green deployment strategy for zero-downtime updates
+* Add Kubernetes deployment manifests for container orchestration
