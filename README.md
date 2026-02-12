@@ -65,11 +65,11 @@ On every push to `main`, the CD workflow:
 
 ## Live Deployment
 
+## Live Deployment
+
 The application is deployed on an AWS EC2 instance and runs inside a Docker container.
 
-Swagger documentation is accessible at:
-
-http://3.90.33.89/:8000/docs
+The instance may be stopped when not in use to reduce cost. Deployment proof is included below.
 
 ## Deployment Screenshots
 
