@@ -39,17 +39,16 @@ The CI workflow executes in this order:
 6. Proceeds to Docker build only after test verification
 
 ## Docker Strategy
+I implemented multi-stage Docker builds to optimize the final image size. The first stage uses the full Python 3.11 image to install dependencies. The second stage uses python:3.11-slim and copies only the installed packages from the builder stage. This approach reduced the final image content from 432 MB to 58.5 MB. The total disk usage including shared base layers is 247 MB. Smaller images mean faster deployments, lower bandwidth costs, and reduced attack surface in production.
 
-I implemented multi-stage Docker builds to optimize the final image size. The first stage uses the full Python image to install dependencies. The second stage uses python:3.11-slim and copies only the installed packages from the builder stage.
-
-This reduced the image from 432 MB to 192 MB, a 55% reduction. Smaller images mean faster deployments, lower bandwidth costs, and reduced attack surface in production.
 
 For each successful build, I tag the image twice:
 
 * `latest` for the most recent stable build
 * The commit SHA for exact version traceability
 
-Both tags push to DockerHub automatically. This tagging strategy allows me to roll back to specific commits if needed and maintain a clear deployment history.
+Both tags push to DockerHub automatically. This tagging strategy allows me to roll back to specific commits if needed and maintain a clear deployment history. Also, to prevent image accumulation on the EC2 instance, the deployment pipeline includes automatic cleanup that prunes unused images older than 24 hours.
+
 
 ## Continuous Deployment
 
@@ -74,14 +73,6 @@ The application is deployed on an AWS EC2 instance and runs inside a Docker cont
 API Documentation Interface:
 
 ![Swagger UI](assets/task-api-service-ui.png)
-
-Docker Image on DockerHub:
-
-![DockerHub Repository](assets/docker-repository.png)
-
-Application Running on EC2:
-
-![EC2 Container](assets/EC2-task-api.png)
 
 ## Running Locally
 
