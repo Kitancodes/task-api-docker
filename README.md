@@ -66,9 +66,7 @@ The entire process from git push to live deployment takes approximately three mi
 
 ## Infrastructure 
 
-The application is deployed on an AWS EC2 instance running Ubuntu 24.04. Nginx sits in front of the application as a reverse proxy, handling SSL termination and forwarding requests to the Docker container running on localhost:8000.The instance is currently stopped to manage AWS free tier credits. The full 
-deployment was tested and verified at https://taskapi.duckdns.org. 
-Screenshots of the live deployment are included below.
+The application is deployed on an AWS EC2 instance running Ubuntu 24.04. Nginx sits in front of the application as a reverse proxy, handling SSL termination and forwarding requests to the Docker container running on localhost:8000. The instance is currently stopped to manage AWS free tier credits. Screenshots of the live deployment are included below.
 
 ## Deployment Screenshots
 
