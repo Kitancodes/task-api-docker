@@ -66,7 +66,7 @@ The entire process from git push to live deployment takes approximately three mi
 
 ## Infrastructure 
 
-The application is deployed on an AWS EC2 instance and runs inside a Docker container. The instance may be stopped when not in use to reduce cost, but the deployment proof is included below.
+The application is deployed on an AWS EC2 instance running Ubuntu 24.04. Nginx sits in front of the application as a reverse proxy, handling SSL termination and forwarding requests to the Docker container running on localhost:8000.The application is accessible at https://taskapi.duckdns.org
 
 ## Deployment Screenshots
 
