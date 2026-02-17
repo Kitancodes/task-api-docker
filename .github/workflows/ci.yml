@@ -58,5 +58,5 @@ jobs:
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/task-api:latest
             docker stop task-api || true
             docker rm task-api || true
-            docker run -d -p 8000:8000 --name task-api --restart unless-stopped ${{ secrets.DOCKERHUB_USERNAME }}/task-api:latest
+            docker run -d -p 127.0.0.1:8000 --name task-api --restart unless-stopped ${{ secrets.DOCKERHUB_USERNAME }}/task-api:latest
             docker image prune -af --filter "until=24h"
