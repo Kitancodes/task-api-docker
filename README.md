@@ -116,7 +116,7 @@ Access the API documentation at http://localhost:8000/docs
 
 I plan to implement these improvements:
 
-* * Implement PostgreSQL database with Docker Compose for persistent storage
+* Implement PostgreSQL database with Docker Compose for persistent storage
 * Set up centralized logging with Loki and Promtail
 * Add monitoring and alerting with Prometheus and Grafana
 * Implement blue-green deployment strategy for zero-downtime updates
